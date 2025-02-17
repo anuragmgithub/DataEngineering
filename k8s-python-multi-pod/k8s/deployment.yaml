@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: script1-deployment
+spec:
+  replicas: 1  # One pod per script
+  selector:
+    matchLabels:
+      app: multi-script
+      script: script1
+  template:
+    metadata:
+      labels:
+        app: multi-script
+        script: script1
+    spec:
+      containers:
+      - name: script1
+        image: my-python-scripts:latest
+        imagePullPolicy: Never
+        command: ["python", "/app/scripts/script1.py"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: script2-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multi-script
+      script: script2
+  template:
+    metadata:
+      labels:
+        app: multi-script
+        script: script2
+    spec:
+      containers:
+      - name: script2
+        image: my-python-scripts:latest
+        imagePullPolicy: Never
+        command: ["python", "/app/scripts/script2.py"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: script3-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: multi-script
+      script: script3
+  template:
+    metadata:
+      labels:
+        app: multi-script
+        script: script3
+    spec:
+      containers:
+      - name: script3
+        image: my-python-scripts:latest
+        imagePullPolicy: Never
+        command: ["python", "/app/scripts/script3.py"]

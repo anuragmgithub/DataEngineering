@@ -1,0 +1,16 @@
+image:
+  repository: pyspark-scheduled-job  # Use the local Docker image name
+  tag: latest
+
+schedule: "*/1 * * * *"   # Runs every hour
+
+sparkJob:
+  sparkVersion: "3.1.1"
+  driver:
+    cores: 1
+    memory: "1g"
+    serviceAccount: spark
+  executor:
+    cores: 2
+    instances: 2
+    memory: "2g"

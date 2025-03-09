@@ -1,0 +1,4 @@
+apiVersion: v2
+name: pyspark-scheduled-job
+description: A Helm chart for deploying PySpark scheduled job
+version: 1.0.0

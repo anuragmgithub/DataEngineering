@@ -1,0 +1,32 @@
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: ScheduledSparkApplication
+metadata:
+  name: {{ .Release.Name }}
+  namespace: spark-jobs  # Change this to your namespace if needed
+spec:
+  schedule: "{{ .Values.schedule }}"  # e.g., "0 * * * *"
+  concurrencyPolicy: Replace
+  suspend: false
+  successfulRunHistoryLimit: 3
+  failedRunHistoryLimit: 3
+  template:
+    type: Python  # Set application type (Java, Python, Scala, R)
+    mode: cluster
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    imagePullPolicy: IfNotPresent
+    mainApplicationFile: "local:///app/job.py"  # Ensure this is correct
+    sparkVersion: "{{ .Values.sparkJob.sparkVersion }}"
+    restartPolicy:
+      type: Never
+    driver:
+      cores: {{ .Values.sparkJob.driver.cores }}
+      memory: "{{ .Values.sparkJob.driver.memory }}"
+      labels:
+        version: "{{ .Values.sparkJob.sparkVersion }}"
+      serviceAccount: spark
+    executor:
+      cores: {{ .Values.sparkJob.executor.cores }}
+      instances: {{ .Values.sparkJob.executor.instances }}
+      memory: "{{ .Values.sparkJob.executor.memory }}"
+      labels:
+        version: "{{ .Values.sparkJob.sparkVersion }}"

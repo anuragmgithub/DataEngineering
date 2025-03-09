@@ -9,8 +9,8 @@ sparkJob:
   driver:
     cores: 1
     memory: "1g"
-    serviceAccount: spark
+    serviceAccount: spark-operator-spark
   executor:
-    cores: 2
-    instances: 2
+    cores: 1
+    instances: 1
     memory: "2g"

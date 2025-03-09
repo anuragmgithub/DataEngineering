@@ -23,7 +23,7 @@ spec:
       memory: "{{ .Values.sparkJob.driver.memory }}"
       labels:
         version: "{{ .Values.sparkJob.sparkVersion }}"
-      serviceAccount: spark
+      serviceAccount: spark 
     executor:
       cores: {{ .Values.sparkJob.executor.cores }}
       instances: {{ .Values.sparkJob.executor.instances }}

@@ -65,6 +65,34 @@ helm install spark-operator spark-operator/spark-operator \
 --set serviceAccounts.spark.name=spark → Creates a service account for Spark jobs.  
 --set sparkOperator.createClusterRole=true → Grants the Spark Operator cluster-wide permissions.  
 
+### Key Components of a ServiceAccount:  
+A ServiceAccount consists of:  
+1. ServiceAccount Object: Defines the identity.
+2. Role or ClusterRole: Defines the permissions.
+3. RoleBinding or ClusterRoleBinding: Assigns the permissions to the ServiceAccount. 
+
+steps:  
+1. Create a ServiceAccount.
+2. Define a Role with Necessary Permissions.  
+3. Bind the Role to the ServiceAccount.  
+4. Use the ServiceAccount in a Spark Job.  
+
+
+#### Types of ServiceAccounts:  
+1. Default ServiceAccount (Automatically Created)
+
+Every namespace has a default ServiceAccount.
+If a pod doesn’t specify a ServiceAccount, it runs under default.
+2. Custom ServiceAccounts (User-Defined for Security)
+
+Can have specific permissions to interact with Kubernetes API.
+Useful for applications needing limited API access.
+
+3. Cluster-Wide ServiceAccounts (Using ClusterRole)
+
+If a pod needs to access resources across namespaces, you create a ClusterRole and ClusterRoleBinding instead of a simple Role.
+
+
 
 
 

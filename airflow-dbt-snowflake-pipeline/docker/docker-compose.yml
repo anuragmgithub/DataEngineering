@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: source_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306" 
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  airflow:
+    image: apache/airflow:2.6.0
+    container_name: airflow
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://user:password@mysql/source_db
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./dbt:/opt/dbt
+    ports:
+      - "8080:8080"
+    entrypoint: >
+      sh -c "pip install mysql-connector-python &&
+             airflow db upgrade &&
+             airflow scheduler & 
+             airflow webserver"
+
+volumes:
+  mysql_data:

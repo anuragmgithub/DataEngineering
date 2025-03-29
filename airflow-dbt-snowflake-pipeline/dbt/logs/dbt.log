@@ -1,0 +1,30 @@
+[0m16:50:33.739826 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f580c22ddb0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f580b16e830>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f580b16e890>]}
+
+
+============================== 16:50:33.744132 | 965890a9-45dc-427e-a9de-e09312d939e8 ==============================
+[0m16:50:33.744132 [info ] [MainThread]: Running with dbt=1.9.3
+[0m16:50:33.745765 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'fail_fast': 'False', 'profiles_dir': '/home/anurag/.dbt', 'log_path': 'logs', 'debug': 'False', 'version_check': 'True', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'log_format': 'default', 'invocation_command': 'dbt init mysql_to_snowflake_dbt --project-dir .', 'introspect': 'True', 'static_parser': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'send_anonymous_usage_stats': 'True'}
+[0m16:50:33.764132 [debug] [MainThread]: Starter project path: /home/anurag/vscode/wkspace/DataEngineering/airflow-dbt-snowflake-pipeline/dbt-venv/lib/python3.10/site-packages/dbt/include/starter_project
+[0m16:50:33.781848 [info ] [MainThread]: 
+Your new dbt project "mysql_to_snowflake_dbt" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m16:50:33.782900 [info ] [MainThread]: Setting up your profile.
+[0m16:57:13.391564 [info ] [MainThread]: Profile mysql_to_snowflake_dbt written to /home/anurag/.dbt/profiles.yml using target's profile_template.yml and your supplied values. Run 'dbt debug' to validate the connection.
+[0m16:57:13.393758 [debug] [MainThread]: Resource report: {"command_name": "init", "command_success": true, "command_wall_clock_time": 399.82706, "process_in_blocks": "8", "process_kernel_time": 0.119465, "process_mem_max_rss": "108804", "process_out_blocks": "80", "process_user_time": 2.966734}
+[0m16:57:13.394758 [debug] [MainThread]: Command `dbt init` succeeded at 16:57:13.394487 after 399.83 seconds
+[0m16:57:13.396260 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f580c22ddb0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f580b16e8f0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x7f580b1517b0>]}
+[0m16:57:13.398792 [debug] [MainThread]: Flushing usage events
+[0m16:57:14.471172 [debug] [MainThread]: An error was encountered while trying to flush usage events

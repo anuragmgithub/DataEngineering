@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "Transaction",
+  "fields": [
+    {"name": "id", "type": "int"},
+    {"name": "order_id", "type": "int"},
+    {"name": "payment_method", "type": "string"},
+    {"name": "status", "type": "string"},
+    {"name": "timestamp", "type": "string"}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "Product",
+  "fields": [
+    {"name": "id", "type": "int"},
+    {"name": "name", "type": "string"},
+    {"name": "category", "type": "string"},
+    {"name": "price", "type": "float"},
+    {"name": "stock", "type": "int"}
+  ]
+}

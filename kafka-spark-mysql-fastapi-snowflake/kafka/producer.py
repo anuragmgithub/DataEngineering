@@ -18,7 +18,7 @@ schema_registry_client = SchemaRegistryClient({"url": SCHEMA_REGISTRY_URL})
 
 # Load Avro Schemas
 def load_avro_schema(schema_name):
-    with open(f"kafka/schemas/{schema_name}.avsc", "r") as f:
+    with open(f"/home/anurag/vscode/wkspace/DataEngineering/kafka-spark-mysql-fastapi-snowflake/kafka/schemas/{schema_name}.avsc", "r") as f:
         return f.read()
 
 schemas = {

@@ -1,6 +1,7 @@
 # Ignore virtual environments
 venv/
 .venv/
+ignore/
 
 # Ignore Airflow database and logs
 airflow/airflow.db

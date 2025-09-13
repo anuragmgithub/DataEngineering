@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+    depends_on:
+      - zookeeper
+
+  pinot-controller:
+    image: apachepinot/pinot:0.10.0
+    command: StartController -configFileName /opt/pinot/config/controller.conf
+    ports:
+      - "9000:9000"
+
+  pinot:
+    image: apachepinot/pinot:0.10.0-quickstart
+    ports:
+      - "9000:9000"   # Controller UI
+      - "8098:8098"   # Server
+      - "8099:8099"   # Broker
+    environment:
+      JAVA_OPTS: "-Xms512M -Xmx1024M"
+    depends_on:
+      - kafka

@@ -1,0 +1,12 @@
+{
+  "schemaName": "events_append",
+  "dimensionFieldSpecs": [
+    { "name": "eventId", "dataType": "STRING" },
+    { "name": "userId", "dataType": "STRING" },
+    { "name": "eventType", "dataType": "STRING" }
+  ],
+  "metricFieldSpecs": [
+    { "name": "amount", "dataType": "DOUBLE" }
+  ],
+  "timeFieldSpec": { "name": "ts", "dataType": "LONG", "format": "1:MILLISECONDS:EPOCH" }
+}

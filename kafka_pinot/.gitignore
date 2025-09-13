@@ -1,0 +1,9 @@
+.pinotvenv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+.DS_Store
+.idea/  

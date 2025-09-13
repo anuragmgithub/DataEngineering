@@ -1,0 +1,93 @@
+version: "3.8"
+
+services:
+  # -----------------------------
+  # Zookeeper (needed by Kafka)
+  # -----------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  # -----------------------------
+  # Kafka Broker
+  # -----------------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # -----------------------------
+  # Spark Master
+  # -----------------------------
+  spark-master:
+    image: bitnami/spark:3.5.1
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "7077:7077"   # Spark master port
+      - "8080:8080"   # Spark master web UI
+
+  # -----------------------------
+  # Spark Worker
+  # -----------------------------
+  spark-worker:
+    image: bitnami/spark:3.5.1
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    ports:
+      - "8081:8081"   # Spark worker UI
+    depends_on:
+      - spark-master
+
+  # -----------------------------
+  # Spark History Server (optional)
+  # -----------------------------
+  spark-history:
+    image: bitnami/spark:3.5.1
+    container_name: spark-history
+    environment:
+      - SPARK_MODE=history-server
+      - SPARK_HISTORY_SERVER_LOG_DIR=/tmp/spark-events
+    ports:
+      - "18080:18080"
+    volumes:
+      - ./spark-events:/tmp/spark-events
+
+  # -----------------------------
+  # Kafka UI (optional)
+  # -----------------------------
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS: |
+        [
+          {
+            "name": "local",
+            "bootstrapServers": "kafka:9092"
+          }
+        ]
+    depends_on:
+      - kafka
+
+networks:
+  default:
+    name: spark-kafka-net

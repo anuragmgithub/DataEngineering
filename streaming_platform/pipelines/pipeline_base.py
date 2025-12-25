@@ -1,7 +1,6 @@
 from pyspark.sql import SparkSession
 from configs.schema import SparkConfig
 
-
 class SparkSessionfactory:
     """
     _spark belongs to the class, not instances

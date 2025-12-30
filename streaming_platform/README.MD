@@ -59,3 +59,20 @@ helm/stream-pipeline/
     ├── service.yaml        # Exposes application internally/externally
 
 ```
+## Helm chart visual representation:
+```
+     (Your Helm Chart)
+      templates/         <--- static structure
+      Chart.yaml
+      values.yaml
+           |
+       helm package
+           |
+    stream-pipeline-0.1.0.tgz
+           |
+       helm push → AWS ECR
+           |
+    helm pull & deploy anywhere
+           |
+ helm install/upgrade -f prod.yaml    <--- dynamic overrides
+```

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: stream-pipeline
+version: 0.1.0
+description: Streaming ETL pipeline

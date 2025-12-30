@@ -1,0 +1,17 @@
+env: dev 
+image: stream-pipeline:latest
+
+stream-pipeline:latest:
+  name: "{{env.env}}_{{source.topic}}_to_{{target.type}}"
+  mode: stream  
+
+spark:
+  app_name: "{{stream-pipeline.name}}_spark"
+  master: k8s
+  executor:
+    instances: 3
+    memory: 4g
+    cores: 2
+    spot: true
+
+configfile: /app/configs/pipeline.yml

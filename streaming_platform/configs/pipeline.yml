@@ -1,0 +1,37 @@
+env:
+  env: dev
+
+pipeline:
+  name: "{{env.env}}_{{source.topic}}_to_{{target.type}}"
+  mode: stream
+
+source:
+  type: kafka
+  bootstrap_servers: "kafka:9092"
+  topic: "user-events"
+  group_id: "consumer-1"
+  starting_offsets: earliest
+
+target:
+  type: mysql
+  host: mysql.default.svc.cluster.local
+  database: analytics
+  table: user_events
+  user: admin
+  password: admin123
+
+spark:
+  app_name: "{{pipeline.name}}_spark"
+  master: k8s
+  executor:
+    instances: 3
+    memory: 4g
+    cores: 2
+    spot: true
+
+checkpoint:
+  location: "s3://streaming/checkpoints/user-events"
+
+metrics:
+  enabled: true
+  port: 8000

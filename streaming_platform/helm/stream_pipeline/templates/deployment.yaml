@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "stream-pipeline.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "stream-pipeline.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "stream-pipeline.name" . }}
+    spec:
+      containers:
+        - name: spark-pipeline
+          image: {{ .Values.image }}
+          command: ["spark-submit"]
+          args:
+            - "--master"
+            - "k8s://https://kubernetes.default.svc"
+            - "--deploy-mode"
+            - "cluster"
+            - "--conf"
+            - "spark.executor.instances={{ .Values.spark.executorInstances }}"
+            - "--conf"
+            - "spark.executor.memory={{ .Values.spark.executorMemory }}"
+            - "--conf"
+            - "spark.executor.cores={{ .Values.spark.executorCores }}"
+            - "/app/src/main.py"
+            - "--config"
+            - "/config/app_config.yaml"
+          volumeMounts:
+            - name: app-config
+              mountPath: /config
+      volumes:
+        - name: app-config
+          configMap:
+            name: {{ include "stream-pipeline.fullname" . }}-config

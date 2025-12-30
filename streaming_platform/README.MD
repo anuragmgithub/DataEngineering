@@ -1,3 +1,4 @@
+```
 streaming-platform/
 │
 ├── docker-compose.yml               # All services: Kafka (3 nodes), Spark, MySQL, Postgres, Superset, Prometheus, Grafana
@@ -45,3 +46,16 @@ streaming-platform/
 │
 └── tests/                             # Unit / integration tests
     └── test_pipeline.py
+```
+## HELM CHART 
+```
+helm/stream-pipeline/
+├── Chart.yaml              # Basic metadata of the chart
+├── values.yaml             # Default config values for templating
+└── templates/              # All Kubernetes manifests to be rendered
+    ├── deployment.yaml     # Deployment spec for your application
+    ├── configmap.yaml      # Inject configuration files into pods
+    ├── secret.yaml         # Securely store passwords/keys
+    ├── service.yaml        # Exposes application internally/externally
+
+```

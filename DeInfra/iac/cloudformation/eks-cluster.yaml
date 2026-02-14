@@ -1,0 +1,181 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EKS Cluster with On-Demand and Spot Node Groups
+
+Parameters:
+  ClusterName:
+    Type: String
+    Default: eks-data-lake
+
+  NodeInstanceType:
+    Type: String
+    Default: m5.xlarge
+
+  SpotInstanceType:
+    Type: String
+    Default: m5.xlarge
+
+Resources:
+
+############################
+# IAM Roles
+############################
+  EKSClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: eks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+
+  EKSNodeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+
+############################
+# VPC
+############################
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+############################
+# Public Subnets
+############################
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: kubernetes.io/cluster/eks-data-lake
+          Value: shared
+
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: kubernetes.io/cluster/eks-data-lake
+          Value: shared
+
+############################
+# Route Table
+############################
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  Subnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet1
+      RouteTableId: !Ref RouteTable
+
+  Subnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet2
+      RouteTableId: !Ref RouteTable
+
+############################
+# EKS Cluster
+############################
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Ref ClusterName
+      Version: "1.29"
+      RoleArn: !GetAtt EKSClusterRole.Arn
+      ResourcesVpcConfig:
+        SubnetIds:
+          - !Ref Subnet1
+          - !Ref Subnet2
+
+############################
+# ON-DEMAND NodeGroup
+############################
+  OnDemandNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    DependsOn: EKSCluster
+    Properties:
+      ClusterName: !Ref ClusterName
+      NodegroupName: core-ondemand
+      NodeRole: !GetAtt EKSNodeRole.Arn
+      Subnets:
+        - !Ref Subnet1
+        - !Ref Subnet2
+      InstanceTypes:
+        - !Ref NodeInstanceType
+      ScalingConfig:
+        MinSize: 1
+        DesiredSize: 1
+        MaxSize: 3
+      Labels:
+        workload: core
+      CapacityType: ON_DEMAND
+
+############################
+# SPOT NodeGroup
+############################
+  SpotNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    DependsOn: EKSCluster
+    Properties:
+      ClusterName: !Ref ClusterName
+      NodegroupName: spark-spot
+      NodeRole: !GetAtt EKSNodeRole.Arn
+      Subnets:
+        - !Ref Subnet1
+        - !Ref Subnet2
+      InstanceTypes:
+        - !Ref SpotInstanceType
+      ScalingConfig:
+        MinSize: 0
+        DesiredSize: 1
+        MaxSize: 10
+      Labels:
+        workload: spark
+        lifecycle: spot
+      CapacityType: SPOT

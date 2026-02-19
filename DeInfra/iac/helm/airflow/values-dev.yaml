@@ -1,0 +1,36 @@
+executor: KubernetesExecutor
+
+images:
+  airflow:
+    repository: apache/airflow
+    tag: "3.0.0"
+
+config:
+  core:
+    executor: KubernetesExecutor
+    load_examples: "False"
+
+
+webserver:
+  service:
+    type: ClusterIP
+
+scheduler:
+  replicas: 1
+
+triggerer:
+  enabled: true
+
+dags:
+  persistence:
+    enabled: false
+
+logs:
+  persistence:
+    enabled: false
+    
+postgresql:
+  enabled: true
+
+redis:
+  enabled: false

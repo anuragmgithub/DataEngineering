@@ -75,5 +75,3 @@ kubectl describe pvc <pvc-name> -n airflow
 - cost optimization
 - spot-aware scheduling
 
-
-

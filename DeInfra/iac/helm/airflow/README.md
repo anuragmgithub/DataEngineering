@@ -68,10 +68,12 @@ kubectl describe pvc <pvc-name> -n airflow
 ```
 
 ## TODO 
+- Identity providers 
 - External RDS
 - S3 logs
 - ALB ingress
 - autoscaling
 - cost optimization
 - spot-aware scheduling
+- IAM policies separate in codebase 
 

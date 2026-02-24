@@ -1,0 +1,10 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: banking-transactions
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: banking-kafka
+spec:
+  partitions: 6
+  replicas: 3

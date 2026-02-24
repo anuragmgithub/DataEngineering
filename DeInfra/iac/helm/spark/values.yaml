@@ -1,0 +1,94 @@
+# Spark Operator Helm Chart Values
+# Reference: https://github.com/kubeflow/spark-operator/blob/master/charts/spark-operator/values.yaml
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/kubeflow/spark-operator
+  pullPolicy: IfNotPresent
+  tag: "v1beta2-1.3.8-3.5.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+namespace: spark-operator
+
+rbac:
+  create: true
+  annotations: {}
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 65534
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  runAsNonRoot: true
+  runAsUser: 65534
+
+service:
+  type: ClusterIP
+  port: 8080
+  portName: webhook
+
+webhook:
+  enable: true
+  port: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Spark configuration
+spark:
+  # Default values for Spark applications
+  defaultConfig:
+    # Spark executor memory
+    spark.executor.memory: "2g"
+    # Spark driver memory
+    spark.driver.memory: "1g"
+    # Spark executor cores
+    spark.executor.cores: "1"
+    # Spark driver cores
+    spark.driver.cores: "1"
+    # Enable Iceberg
+    spark.jars.packages: "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.4.0"
+    # Iceberg catalog type
+    spark.sql.catalog.demo: "org.apache.iceberg.spark.SparkCatalog"
+    spark.sql.catalog.demo.type: "hadoop"
+    spark.sql.catalog.demo.warehouse: "/warehouse"
+
+# Operator configuration
+operator:
+  # Number of worker threads for the operator
+  workerThreads: 4
+  # Webhook configuration
+  webhook:
+    enable: true
+    port: 8080
+    timeout: 10
+
+# Monitoring
+monitoring:
+  enabled: true
+  metricsPort: 8080

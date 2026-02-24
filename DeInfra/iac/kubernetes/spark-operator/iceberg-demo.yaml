@@ -1,0 +1,134 @@
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: iceberg-demo
+  namespace: spark-operator
+spec:
+  type: Python
+  pythonVersion: "3"
+
+  image: "spark:3.5.0-iceberg"
+  imagePullPolicy: IfNotPresent
+
+  mainApplicationFile: "local:///opt/spark/app/iceberg_demo.py"
+
+  # Spark configuration for Iceberg
+  sparkConf:
+    "spark.sql.catalog.demo": "org.apache.iceberg.spark.SparkCatalog"
+    "spark.sql.catalog.demo.type": "hadoop"
+    "spark.sql.catalog.demo.warehouse": "/warehouse"
+    "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+    "spark.jars.packages": "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.4.0"
+    "spark.sql.defaultCatalog": "demo"
+
+  hadoopConf:
+    "fs.defaultFS": "file://"
+
+  # Driver configuration
+  driver:
+    cores: 1
+    memory: "1g"
+    serviceAccount: "spark"
+    labels:
+      version: v3.5.0
+      iceberg-enabled: "true"
+    volumeMounts:
+      - name: data
+        mountPath: "/data"
+      - name: warehouse
+        mountPath: "/warehouse"
+
+  # Executor configuration
+  executor:
+    cores: 1
+    memory: "2g"
+    instances: 2
+    labels:
+      version: v3.5.0
+      iceberg-enabled: "true"
+    volumeMounts:
+      - name: data
+        mountPath: "/data"
+      - name: warehouse
+        mountPath: "/warehouse"
+
+  # Volumes for data and Iceberg warehouse
+  volumes:
+    - name: data
+      emptyDir: {}
+    - name: warehouse
+      emptyDir: {}
+
+  restartPolicy:
+    type: Never
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iceberg-demo-script
+  namespace: spark-operator
+data:
+  iceberg_demo.py: |
+    from pyspark.sql import SparkSession
+    from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
+
+    # Create Spark session with Iceberg support
+    spark = SparkSession.builder \
+        .appName("IcebergDemo") \
+        .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions") \
+        .config("spark.sql.catalog.demo", "org.apache.iceberg.spark.SparkCatalog") \
+        .config("spark.sql.catalog.demo.type", "hadoop") \
+        .config("spark.sql.catalog.demo.warehouse", "/warehouse") \
+        .config("spark.sql.defaultCatalog", "demo") \
+        .getOrCreate()
+
+    print("Spark Session created successfully!")
+
+    # Create a sample DataFrame
+    data = [
+        ("Alice", 25, 1000.50),
+        ("Bob", 30, 1500.75),
+        ("Charlie", 35, 2000.00),
+        ("David", 40, 2500.25)
+    ]
+
+    schema = StructType([
+        StructField("name", StringType(), True),
+        StructField("age", IntegerType(), True),
+        StructField("salary", DoubleType(), True)
+    ])
+
+    df = spark.createDataFrame(data, schema=schema)
+
+    # Create Iceberg table
+    print("Creating Iceberg table...")
+    df.writeTo("demo.employees_iceberg") \
+        .option("write-format", "parquet") \
+        .createOrReplace()
+
+    print("Iceberg table created successfully!")
+
+    # Read from Iceberg table
+    employees = spark.table("demo.employees_iceberg")
+    print("\nEmployees table:")
+    employees.show()
+
+    # Write to Iceberg table (append mode)
+    new_data = [("Eve", 28, 1800.00)]
+    new_df = spark.createDataFrame(new_data, schema=schema)
+
+    print("Appending new data...")
+    new_df.writeTo("demo.employees_iceberg").append()
+
+    # Read updated table
+    employees_updated = spark.table("demo.employees_iceberg")
+    print("\nUpdated Employees table:")
+    employees_updated.show()
+
+    # Show table history (Iceberg time travel)
+    print("\nTable history:")
+    spark.sql("SELECT * FROM demo.employees_iceberg.history").show()
+
+    print("\nDemo completed successfully!")
+    spark.stop()
